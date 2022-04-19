@@ -1,0 +1,53 @@
+type Query {
+	apis:[Api]
+	domain: String
+}
+
+
+type Api {
+	domain : String
+	endpoints : [Endpoint]
+}
+
+type Endpoint {
+	path : String
+	method : String
+	headers : [Header]
+	responseHeaders : [Header]
+}
+
+type Header {
+	key : String
+	value : String 
+}
+
+type Mutation {
+	modifyApi(domain:String) : ModifyApi
+	createApi(domain:String) : ModifyApi
+	deleteApi(domain:String) : String
+}
+
+type ModifyApi {
+	createEndpoint(path : String!): ModifyEndpoint
+	modifyEndpoint(path : String!): ModifyEndpoint
+	deleteEndpoint(path : String!): String
+}
+
+type ModifyEndpoint {
+	setPath(path:String!) : String
+	setMethod(method:String!) : String
+	modifyHeaders : ModifyHeaders
+	modifyResponceHeaders: ModifyHeaders
+	modifyBody: ModifyBody
+	modifyResponceBody : ModifyBody
+}
+
+type ModifyHeaders {
+	setHeader(key : String!, value : String!) : String
+	deleteHeader(key : String!) : String
+}
+
+type ModifyBody {
+	empty: String
+}
+
