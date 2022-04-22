@@ -10,10 +10,9 @@ const schema = makeExecutableSchema({
 	resolvers : resolvers,
 });
 
-export function setupGraphQL(app){
+export function setupGraphQL(){
 	return graphqlHTTP({
 		graphiql : true,
-		resolvers: resolvers,
 		schema : schema,
 	})
 }

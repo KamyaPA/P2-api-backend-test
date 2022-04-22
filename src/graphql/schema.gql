@@ -12,8 +12,10 @@ type Api {
 type Endpoint {
 	path : String
 	method : String
+	description : String
 	headers : [Header]
 	responseHeaders : [Header]
+	call : String
 }
 
 type Header {
@@ -22,9 +24,9 @@ type Header {
 }
 
 type Mutation {
-	modifyApi(domain:String) : ModifyApi
-	createApi(domain:String) : ModifyApi
-	deleteApi(domain:String) : String
+	modifyApi(domain:String!) : ModifyApi
+	createApi(domain:String!) : ModifyApi
+	deleteApi(domain:String!) : String
 }
 
 type ModifyApi {
@@ -36,6 +38,7 @@ type ModifyApi {
 type ModifyEndpoint {
 	setPath(path:String!) : String
 	setMethod(method:String!) : String
+	setDescription(description: String!) : String 
 	modifyHeaders : ModifyHeaders
 	modifyResponceHeaders: ModifyHeaders
 	modifyBody: ModifyBody
