@@ -1,31 +1,29 @@
 import data from '../data/apis.js'
-import {callApi} from '../data/callApi.js'
-
-let activeApi;
+import { callApi } from '../data/callApi.js'
+import { GraphQLJSONObject } from 'graphql-type-json'
 
 export const resolvers = {
+
+	JSONObject : GraphQLJSONObject, 
 	Query : {
 		apis : () =>  data.getStoredApis(),
-		domain : () => "Hello World"
+		call : (parrent, {api, argv}) => callApi(api, argv),
 	},
 	Api   : {
-		endpoints : (parrent) => {
-			activeApi = parrent;
-			return parrent.endpoints;
-		}
+		endpoints : (parrent) => Object.values(parrent.endpoints),
 	},
 	Endpoint : {
-		call : (parrent) => callApi(activeApi, parrent),
 	},
 
 	Mutation : {
-		createApi : (_ , {domain}) => data.createApi(domain),
-		modifyApi : (_ , {domain}) => data.modifyApi(domain),
+		createApi : (_ , {name}) => data.createApi(name),
+		modifyApi : (_ , {name}) => data.modifyApi(name),
 	},
 
 	ModifyApi : {
-		createEndpoint : (parrent , {path}) => data.createEndpoint(parrent, path),
-		modifyEndpoint : (parrent , {path}) => data.modifyEndpoint(parrent, path),
+		setDomain      : (parrent , {domain}) => parrent.domain = domain,
+		createEndpoint : (parrent , {name}) => data.createEndpoint(parrent, name),
+		modifyEndpoint : (parrent , {name}) => data.modifyEndpoint(parrent, name),
 	},
 
 	ModifyEndpoint : {
@@ -34,6 +32,7 @@ export const resolvers = {
 		setDescription: (parrent, {description}) => parrent.description = description,
 		modifyHeaders : (parrent) => parrent.headers,
 		modifyResponceHeaders: (parrent) => parrent.responceHeaders,
+		addQueryParam : (parrent, {params}) => parrent.queryParams.push(...params),
 		modifyBody : () => "unset",
 		modifyResponceBody : () => "unset",
 	},

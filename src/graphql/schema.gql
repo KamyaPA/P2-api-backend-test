@@ -1,21 +1,25 @@
+scalar JSONObject
+
 type Query {
 	apis:[Api]
-	domain: String
+	call(api : String!, argv : [String]) : JSONObject
 }
 
 
 type Api {
+	name : String
 	domain : String
 	endpoints : [Endpoint]
 }
 
 type Endpoint {
+	name : String
 	path : String
 	method : String
 	description : String
 	headers : [Header]
 	responseHeaders : [Header]
-	call : String
+	queryParams : [String]
 }
 
 type Header {
@@ -24,15 +28,16 @@ type Header {
 }
 
 type Mutation {
-	modifyApi(domain:String!) : ModifyApi
-	createApi(domain:String!) : ModifyApi
-	deleteApi(domain:String!) : String
+	modifyApi(name :String!) : ModifyApi
+	createApi(name :String!) : ModifyApi
+	deleteApi(name :String!) : String
 }
 
 type ModifyApi {
-	createEndpoint(path : String!): ModifyEndpoint
-	modifyEndpoint(path : String!): ModifyEndpoint
-	deleteEndpoint(path : String!): String
+	setDomain( domain : String! ) : String
+	createEndpoint(name : String!): ModifyEndpoint
+	modifyEndpoint(name : String!): ModifyEndpoint
+	deleteEndpoint(name : String!): String
 }
 
 type ModifyEndpoint {
@@ -43,6 +48,7 @@ type ModifyEndpoint {
 	modifyResponceHeaders: ModifyHeaders
 	modifyBody: ModifyBody
 	modifyResponceBody : ModifyBody
+	addQueryParam(params : [String]!): [String]
 }
 
 type ModifyHeaders {
