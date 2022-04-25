@@ -6,9 +6,18 @@ export const resolvers = {
 
 	JSONObject : GraphQLJSONObject, 
 	Query : {
-		apis : () =>  data.getStoredApis(),
+		apis : (_, {name}) =>  {
+			if(name){ 
+				return data.getStoredApis().filter((api) => {
+					return api.name === name;
+				})
+			} else{
+				return data.getStoredApis();
+			}
+		},
 		call : (parrent, {api, argv}) => callApi(api, argv),
 	},
+
 	Api   : {
 		endpoints : (parrent) => Object.values(parrent.endpoints),
 	},

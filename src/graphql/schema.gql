@@ -1,7 +1,7 @@
 scalar JSONObject
 
 type Query {
-	apis:[Api]
+	apis(name: String):[Api]
 	call(api : String!, argv : [String]) : JSONObject
 }
 
