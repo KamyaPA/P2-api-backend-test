@@ -1,51 +1,55 @@
-let storedApisArray = [];
+export let storedApis = {};
 
 export default {
-	getStoredApis : () => storedApisArray,
+	getStoredApis : () => Object.values(storedApis),
 
 	// API - domain \\
 
-	modifyApi : (domain) => {
-		let api = storedApisArray.find(value => value.domain === domain);
+	modifyApi : (name) => {
+		let api = storedApis[name];
 		if (!api) {
 			throw "Api does not exist";
 		}
-		return {targetApi : api};
+		return api;
 	},
 
-	createApi : (domain) =>  {
-		if( storedApisArray.find(value => value.domain === domain)){
+	createApi : (name) =>  {
+		if( storedApis[name] ){
 			throw "Api allready exists";
 		}
 
 		let newApi = {
-			domain : domain,
-			endpoints : []
+			name : name,
+			domain : "",
+			endpoints : {}
 		}
-		storedApisArray.push(newApi);
+		storedApis[name] = newApi;
 		return newApi;
 	},
 
 	// ENDPOINTS \\
 
-	createEndpoint : (api, path) => {
-		if(api.endpoints.find(value => value.path === path)){
+	createEndpoint : (api, name) => {
+		if(api.endpoints[name]){
 			throw "Endpoint allready exists";
 		}
 		let endpoint = {
-			path : path,
+			name : name,
+			path : "",
 			method : undefined,
+			description : "",
 			headers : [],
+			queryParams : [],
 			responceHeaders : [],
 			body : undefined,
 			responceBody : undefined,
 		}
-		api.endpoints.push(endpoint);
+		api.endpoints[name] = endpoint;
 		return endpoint;
 	},
 
-	modifyEndpoint : (api, path) => {
-		let endpoint = api.endpoints.find(value => value.path === path);
+	modifyEndpoint : (api, name) => {
+		let endpoint = api.endpoints[name];
 		if(!endpoint){
 			throw "Endpoint does not exist";
 		}
@@ -68,13 +72,13 @@ export default {
 	},
 
 	deleteHeader : (headerList, key) => {
-		let header = headerList.find(value => value.key === key);
-		if(header === undefined){
+		let oldLength = headerList.length;
+		headerList = headerList.filter(value => value.key === key)
+		let newLength = headerList.length;
+		if(newLength === oldLength){
 			throw "header does not exist";
 		}
-		else{
-			delete header;
-		}
+		return `Header whith key: ${key}  deleted`
 	},
 }
 
