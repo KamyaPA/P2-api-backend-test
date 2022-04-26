@@ -19,8 +19,17 @@ export const resolvers = {
 	},
 
 	Api   : {
-		endpoints : (parrent) => Object.values(parrent.endpoints),
+		endpoints : (parrent) => {
+			if(parrent){
+				return Object.values(parrent.endpoints).filter((endpoints) => {
+					return endpoints.parrent === parrent;
+				})
+			} else{
+					return Object.values(parrent.endpoints);
+			}
+		}
 	},
+	
 	Endpoint : {
 	},
 
