@@ -9,9 +9,7 @@ export const resolvers = {
 
 		apis : (_, {name}) =>  {
 			if(name){ 
-				return data.getStoredApis().filter((api) => {
-					return api.name === name;
-				})
+				return data.getStoredApis().filter((api) => api.name === name)
 			} else{
 				return data.getStoredApis();
 			}
@@ -21,11 +19,9 @@ export const resolvers = {
 	},
 
 	Api   : {
-    endpoints : (parrent) => {
-        if(parrent){
-            return Object.values(parrent.endpoints).filter((endpoints) => {
-                return endpoints.parrent === parrent;
-            })
+    endpoints : (parrent, {name}) => {
+        if(name){
+            return Object.values(parrent.endpoints).filter(endpoint => endpoint.name === name)
         } else{
                 return Object.values(parrent.endpoints);
         }

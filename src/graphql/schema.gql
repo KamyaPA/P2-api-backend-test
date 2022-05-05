@@ -1,7 +1,7 @@
 scalar JSON
 
 type Query {
-	apis:[Api]
+	apis(name : String):[Api]
 	call(api : String!, argv : [String], filter : String) : JSON
 }
 
@@ -9,7 +9,7 @@ type Query {
 type Api {
 	name : String
 	domain : String
-	endpoints : [Endpoint]
+	endpoints(name: String) : [Endpoint]
 }
 
 type Endpoint {
