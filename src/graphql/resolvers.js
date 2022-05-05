@@ -6,12 +6,31 @@ export const resolvers = {
 
 	JSON : GraphQLJSON, 
 	Query : {
-		apis : () =>  data.getStoredApis(),
+
+		apis : (_, {name}) =>  {
+			if(name){ 
+				return data.getStoredApis().filter((api) => {
+					return api.name === name;
+				})
+			} else{
+				return data.getStoredApis();
+			}
+		},
 		call : (parrent, {api, argv, filter}) => callApi(api, argv, filter),
+
 	},
+
 	Api   : {
-		endpoints : (parrent) => Object.values(parrent.endpoints),
-	},
+    endpoints : (parrent) => {
+        if(parrent){
+            return Object.values(parrent.endpoints).filter((endpoints) => {
+                return endpoints.parrent === parrent;
+            })
+        } else{
+                return Object.values(parrent.endpoints);
+        }
+    }
+},
 	Endpoint : {
 	},
 
