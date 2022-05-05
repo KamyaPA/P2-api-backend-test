@@ -1,17 +1,18 @@
-export function filterResponse(responce, filterStr){
+export function filterResponse(responce, filterStr, filteredResonce){
+	let rtnObj = {};
 	let filterObject = createFilterObject(filterStr);
 	switch(filterObject.objectType){
 		case "object":
-			responce = filterResponseObject(responce, filterObject.format);
+			responce = filterResponseObject(responce, filterObject.format, rtnObj);
 			break;
 		case "array":
-			responce = filterResponseArray(responce, filterObject.format);
+			responce = filterResponseArray(responce, filterObject.format, rtnObj);
 			break;
 	}
-	return responce;
+	return rtnObj;
 }
-
-function filterResponseObject(responce, format){
+// Deletes from object according to the filter object
+function filterResponseObject(responce, format, rtnObj){
 	let formatKeys = Object.keys(format);
 	let responceKeys = Object.keys(responce);
 	responceKeys.forEach(key => {
@@ -21,15 +22,26 @@ function filterResponseObject(responce, format){
 	})
 	formatKeys.forEach(key => {
 		if(format[key].objectType === "object"){
-			responce[key] = filterResponseObject(responce[key], format[key].format);
-		}
-		else if(format[key].objectType === "array"){
-			responce[key] = filterResponseArray(responce[key], format[key].format);
+			responce[key] = filterResponseObject(responce[key], format[key].format, rtnObj);
+		} else if(format[key].objectType === "array"){
+			responce[key] = filterResponseArray(responce[key], format[key].format, rtnObj);
+		} else if(format[key].objectType === "value" && format[key].rtn.isOn){
+			if(format[key].rtn.isArray){
+				if(rtnObj[format[key].rtn.name]){
+					rtnObj[format[key].rtn.name].push(responce[key]);
+				} else {
+					rtnObj[format[key].rtn.name] = [responce[key]];
+				}
+			} else {
+				rtnObj[format[key].rtn.name] = responce[key];
+			}
 		}
 	})
 	return responce;
 }
-function filterResponseArray(responce, format){
+
+// Deletes from array according to the filter object
+function filterResponseArray(responce, format, rtnObj){
 	function setArgument (argumentStr, object){
 		if(argumentStr.charAt(0) === "'"){
 			return argumentStr.match(/(?<=\')[^\s]+(?=\')/g);
@@ -58,17 +70,27 @@ function filterResponseArray(responce, format){
 	}
 	// Do nested objects or arrays of this array
 	if(format.contains.objectType === "object"){
-		responce.map(value => filterResponseObject(value, format.contains.format));
-	}
-	else if(format.contains.objectType === "array"){
-		responce.map(value => filterResponseArray(value, format.contains.format));
-	};
+		responce.map(value => filterResponseObject(value, format.contains.format, rtnObj));
+	} else if(format.contains.objectType === "array"){
+		responce.map(value => filterResponseArray(value, format.contains.format, rtnObj));
+	} else if(fromat.contains.objectType.value === "value" && format.contains.rtn.isOn){
+		if(format.contains.rtn.isArray){
+			if(rtnObj[format.contains.rtn.name] === undefined){
+				rtnObj[format.contains.rtn.name] = [];
+			}
+			responce.forEach((value) => {
+				rtnObj[format.contains.rtn.name].push(value);
+			})
+		} else {
+			rtnObj[format.contains.rtn.name] = responce[responce.length - 1];
+		}
+	} 
 	return responce;
 }
 
 // Filters object
 function createFilterObject(filterStr){
-	let filterArray = filterStr.match(/([:\(\)\[\]\{\}]|[^\s:\(\)\[\]\{\}]+)/g);
+	let filterArray = filterStr.match(/((=>)|\[=\]|(\[=\])|[:\(\)\[\]\{\}]|[^\s:\(\)\[\]\{\}=>]+)/g);
 	return createObject(filterArray, {objectType : "value", format : {}});
 }
 
@@ -89,12 +111,20 @@ function createObject(filterArray, object){
 			if(argument === undefined) throw "Wrong syntax in filter forgotten an '}'";
 			if(argument === ":"){
 				createObject(filterArray, activeObject);
+			} else if(argument === "=>"){
+				activeObject.rtn.isOn = true;
+				activeObject.rtn.name = filterArray.shift();
+				activeObject.rtn.isArray = false;
+			} else if(argument === "[=]"){
+				activeObject.rtn.isOn = true;
+				activeObject.rtn.name = filterArray.shift();
+				activeObject.rtn.isArray = true;
 			}else{
-				object.format[argument] = {
+				activeObject = object.format[argument] = {
 					objectType : "value",
+					rtn : {isOn : false},
 					format : {}
 				}
-				activeObject = object.format[argument];
 			}
 		}
 	}
@@ -102,6 +132,7 @@ function createObject(filterArray, object){
 	if(object.objectType === "array"){
 		object.format["contains"] = {
 			objectType : "value",
+			rtn : {isOn : false},
 			format : {},
 		}
 		object.format["options"] = {
@@ -114,18 +145,25 @@ function createObject(filterArray, object){
 				case ':':
 					createObject(filterArray, object.format.contains);
 					break;
-				case 'all':
+				case '=>':
+					object.format.contains.rtn.isOn = true;
+					object.format.contains.rtn.name = filterArray.shift();
+					object.format.contains.rtn.isArray = false;
+					break;
+				case '=>':
+					object.format.contains.rtn.isOn = true;
+					object.format.contains.rtn.name = filterArray.shift();
+					object.format.contains.rtn.isArray = true;
+					break;
+				case 'all': // No arguments
 					object.format.options.type = argument;
 					break;
-				case 'between':
-					object.format.options.type = argument;
-					object.format.options.argument = filterArray.shift();
-					break;
+				case 'between': // One argument
 				case 'at':
 					object.format.options.type = argument;
 					object.format.options.argument = filterArray.shift();
 					break;
-				case 'eq':
+				case 'eq': // Two arguments
 				case 'gt':
 				case 'lt':
 					object.format.options.type = argument;
