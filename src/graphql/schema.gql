@@ -1,8 +1,8 @@
-scalar JSONObject
+scalar JSON
 
 type Query {
-	apis(name: String):[Api]
-	call(api : String!, argv : [String]) : JSONObject
+	apis:[Api]
+	call(api : String!, argv : [String], filter : String) : JSON
 }
 
 
