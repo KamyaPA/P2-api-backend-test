@@ -49,8 +49,10 @@ export const resolvers = {
 		setDescription: (parrent, {description}) => parrent.description = description,
 		modifyHeaders : (parrent) => parrent.headers,
 		modifyResponceHeaders: (parrent) => parrent.responceHeaders,
-		addQueryParam : (parrent, {params}) => {
-			params.forEach((value) => {parrent.queryParams.push(value)});
+
+		addQueryParam : (parrent, {params}) => 
+			{params.forEach((value)=>{parrent.queryParams.push(value)});
+
 			return params;
 		},
 		modifyBody : () => "unset",
