@@ -27,6 +27,11 @@ export default {
 		return newApi;
 	},
 
+	deleteApi : (name) => {
+		delete storedApis[name];
+		return `Deleted api ${name}`
+	},
+
 	// ENDPOINTS \\
 
 	createEndpoint : (api, name) => {
@@ -55,6 +60,11 @@ export default {
 		}
 		
 		return endpoint;
+	},
+
+	deleteEndpoint : (api, name) => {
+		delete api.enpoints[name]
+		return `Deleted Enpoint "${api.name}/${name}"`
 	},
 
 	// HEADERS \\

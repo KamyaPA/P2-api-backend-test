@@ -1,7 +1,8 @@
 import fetch from 'node-fetch';
 import { storedApis } from './apis.js';
+import { filterResponse }  from './filter.js'
 
-export async function callApi(apiString, argv){
+export async function callApi(apiString, argv, filterStr){
 	// Get API and endpoint 
 	apiString = apiString.split("/");
 	let api = storedApis[apiString[0]];
@@ -9,7 +10,6 @@ export async function callApi(apiString, argv){
 
 	// Set Parameters
 	let path = api.domain + endpoint.path;
-	console.log(path);
 	let nQueryParams = 0;
 	if(argv){
 		argv.forEach((argument) => {
@@ -30,7 +30,6 @@ export async function callApi(apiString, argv){
 		})
 	}
 	// Call API
-	console.log(path);
 	let data = await fetch(path, {
 		headers : endpoint.headers.reduce((prev, cur) => {prev[cur.key] = cur.value}, {}),
 		method : endpoint.method,
@@ -41,6 +40,11 @@ export async function callApi(apiString, argv){
 		return data;
 	})
 	.then(body => body);
+
+	if(filterStr){
+		data = filterResponse(data, filterStr);
+	}
+
 	return data;
 }
 
