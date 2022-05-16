@@ -52,7 +52,8 @@ export default {
 			queryParams : [],
 			query : {path: [], query: []},
 			output: "",
-			body : undefined,
+			body : "",
+
 		}
 		api.endpoints[name] = endpoint;
 		return endpoint;
@@ -95,5 +96,18 @@ export default {
 		}
 		return `Header whith key: ${key}  deleted`
 	},
+
+	//Body\\
+	setBody : (parent, content) => {
+		
+		if(parent.body === ""){ // if already empty
+			if(content == ""){ // and no input
+				parent.body = content; 
+			}else{
+				parent.body = content; 
+				return `content: ${content}`
+			}
+	    }
+	}
 }
 

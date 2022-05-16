@@ -65,12 +65,16 @@ export const resolvers = {
 
 			return params;
 		},
-		modifyBody : () => "unset",
+		modifyBody : (parrent) => parrent,
 		modifyResponceBody : () => "unset",
 	},
 
 	ModifyHeaders : {
 		setHeader : (parrent, {key, value}) => data.setHeader(parrent, key, value),
 		deleteHeader : (parrent, {key}) => data.deleteHeader(parrent, key),
+	},
+
+	ModifyBody: {
+		setBody : (parrent, {content}) => data.setBody(parrent, content),
 	},
 }

@@ -19,6 +19,7 @@ type Endpoint {
 	description : String
 	headers : [Header]
 	responseHeaders : [Header]
+	body: String
 	queryParams : [String]
 	query : [String]
 	output : String
@@ -60,6 +61,6 @@ type ModifyHeaders {
 }
 
 type ModifyBody {
-	empty: String
+	setBody(content : String) : String
 }
 
