@@ -34,40 +34,80 @@ function filterResponseObject(responce, format, rtnObj){
 				}
 			} else {
 				rtnObj[format[key].rtn.name] = responce[key];
+			
 			}
 		}
 	})
 	return responce;
 }
 
+
 // Deletes from array according to the filter object
 function filterResponseArray(responce, format, rtnObj){
 	function setArgument (argumentStr, object){
 		if(argumentStr.charAt(0) === "'"){
-			return argumentStr.match(/(?<=\')[^\s]+(?=\')/g);
+			return argumentStr.match(/(?<=\')[^\s]+(?=\')/g)[0];
 		}
 		else{
 			return argumentStr.split(".").reduce((before, current) => current = before[current], object);
 		}
 	}
-	// Options And resizing of array
-	switch(format.options.type){
-		case "all":
-			break;
-		case "between":
-			let numbers = format.options.argument.match(/[\d]+/g);
-			responce = responce.slice(numbers[0], numbers[1]);
-			break;
-		case "at":
-			responce = [responce[format.options.argument]];
-			break;
-		case "eq":
-			responce = responce.filter((value) => {
-				let arg1 = setArgument(format.options.argument[0], value);
-				let arg2 = setArgument(format.options.argument[1], value);
-				return arg1 == arg2;
-			}) 
+	function filterLogicOperators(option, logicFunc){
+		return responce.filter((value) => {
+			let arg1 = setArgument(option.argument[0], value);
+			let arg2 = setArgument(option.argument[1], value);
+			function checkRegex(arg, cmp){
+				if(arg.charAt(0) === "/"){
+					let match = arg.match(/((?<=\/)[^]*(?=\/)|[gims]*)/g);
+					if(cmp.match(new RegExp(match[1], match[3]))){
+						arg1 = true;
+						arg2 = true;
+						return true
+					} else {
+						return false;
+					}
+				}
+			}
+
+			// Regex?
+			if(!checkRegex(arg2, arg1))
+				checkRegex(arg1, arg2);
+			// Check
+			return logicFunc(arg1, arg2);
+		}) 
 	}
+	// Options And resizing of array
+	format.options.forEach((option) => {
+		switch(option.type){
+			case "all":
+				break;
+			case "between":
+				let numbers = option.argument.match(/[\d]+/g);
+				responce = responce.slice(numbers[0], numbers[1]);
+				break;
+			case "at":
+				responce = [responce[option.argument]];
+				break;
+			case "eq":
+				responce = filterLogicOperators(option, (a, b) => a == b);
+				break;
+			case "ne":
+				responce = filterLogicOperators(option, (a, b) => a != b);
+				break;
+			case "lt":
+				responce = filterLogicOperators(option, (a, b) => a < b);
+				break;
+			case "gt":
+				responce = filterLogicOperators(option, (a, b) => a > b);
+				break;
+			case "lte":
+				responce = filterLogicOperators(option, (a, b) => a <= b);
+				break;
+			case "gte":
+				responce = filterLogicOperators(option, (a, b) => a >= b);
+				break;
+		}
+	})
 	// Do nested objects or arrays of this array
 	if(format.contains.objectType === "object"){
 		responce.map(value => filterResponseObject(value, format.contains.format, rtnObj));
@@ -90,7 +130,7 @@ function filterResponseArray(responce, format, rtnObj){
 
 // Filters object
 function createFilterObject(filterStr){
-	let filterArray = filterStr.match(/((=>)|\[=\]|(\[=\])|[:\(\)\[\]\{\}]|[^\s:\(\)\[\]\{\}=>]+)/g);
+	let filterArray = filterStr.match(/((=>)|\[=\]|(\[=\])|('[^]+')|[:\(\)\[\]\{\}]|[^\s:\(\)\[\]\{\}=>]+)/g);
 	return createObject(filterArray, {objectType : "value", format : {}});
 }
 
@@ -135,39 +175,39 @@ function createObject(filterArray, object){
 			rtn : {isOn : false},
 			format : {},
 		}
-		object.format["options"] = {
-			type : "all",
-			argument : "",
-		};
+		object.format["options"] = [];
+		const addOption = (type, argument) => ({type: type, argument: argument});
+
 		while((argument = filterArray.shift()) !== "]"){
 			if(argument === undefined) throw "Wrong syntax in filterforgotten an ']'";
 			switch(argument){
 				case ':':
 					createObject(filterArray, object.format.contains);
-					break;
+					continue;
 				case '=>':
 					object.format.contains.rtn.isOn = true;
 					object.format.contains.rtn.name = filterArray.shift();
 					object.format.contains.rtn.isArray = false;
-					break;
-				case '=>':
+					continue;
+				case '[=]':
 					object.format.contains.rtn.isOn = true;
 					object.format.contains.rtn.name = filterArray.shift();
 					object.format.contains.rtn.isArray = true;
-					break;
+					continue;
 				case 'all': // No arguments
-					object.format.options.type = argument;
+					object.format.options.push(addOption(argument, ""));
 					break;
 				case 'between': // One argument
 				case 'at':
-					object.format.options.type = argument;
-					object.format.options.argument = filterArray.shift();
+					object.format.options.push(addOption(argument, filterArray.shift()));
 					break;
 				case 'eq': // Two arguments
-				case 'gt':
+				case 'ne':
 				case 'lt':
-					object.format.options.type = argument;
-					object.format.options.argument = [filterArray.shift(), filterArray.shift()];
+				case 'gt':
+				case 'gte':
+				case 'lte':
+					object.format.options.push(addOption(argument, [filterArray.shift(), filterArray.shift()]));
 					break;
 			}
 		}
