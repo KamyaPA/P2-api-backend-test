@@ -39,15 +39,20 @@ export default {
 			throw "Endpoint allready exists";
 		}
 		let endpoint = {
-			name : name,
+			name: name,
 			path : "",
+			set setPath(value) {
+				let params = value.match(new RegExp("(?<=\{)[^\}]+(?=\})", "g"));
+				this.query.path = params;
+				this.path = value;
+			},
 			method : undefined,
 			description : "",
 			headers : [],
 			queryParams : [],
-			responceHeaders : [],
+			query : {path: [], query: []},
+			output: "",
 			body : undefined,
-			responceBody : undefined,
 		}
 		api.endpoints[name] = endpoint;
 		return endpoint;

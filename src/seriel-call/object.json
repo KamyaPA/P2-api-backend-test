@@ -1,0 +1,13 @@
+{
+	"endpoints" : [
+		"apis" : [
+			{
+				"domain" : "PokeAPI",
+				"endpoint" : "Pokemon",
+				"input" : {
+				
+				}
+			}
+		]
+	]
+}
