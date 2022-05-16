@@ -1,11 +1,36 @@
 import fs from 'fs';
 
+import {createServer} from './seriel-call/loadTemplate.js'
+
 import express from 'express';
 import { setupGraphQL } from './graphql/graphql.js';
 
 const app = express();
 const PORT = 8080;
 const HOSTNAME = 'localhost';
+
+app.use(express.json());
+
+app.get('/', async (req, res) => {
+	const  file = await fs.promises.readFile('./src/pub/Index.html');
+	res.setHeader("content-type", "text/html");
+	res.send(file);
+	res.end();
+})
+
+app.get('/apiCreator.js', async (req, res) => {
+	const  file = await fs.promises.readFile('./src/pub/apiCreator.js');
+	res.setHeader("content-type", "text/javascript");
+	res.send(file);
+	res.end();
+})
+
+app.post('/', () => {
+	const rtnServer = createServer(req.body);
+	res.setHeader("content-type", "text/txt");
+	res.send(rtnServer);
+	res.end();
+})
 
 app.use('/graphql', setupGraphQL());
 

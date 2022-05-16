@@ -28,6 +28,12 @@ export const resolvers = {
     }
 },
 	Endpoint : {
+		query : (parrent) => {
+			let rtn = [];
+			rtn = rtn.concat(parrent.query.query);
+			rtn = rtn.concat(parrent.query.path);
+			return rtn;
+		}
 	},
 
 	Mutation : {
@@ -44,14 +50,18 @@ export const resolvers = {
 	},
 
 	ModifyEndpoint : {
-		setPath : (parrent, {path}) => parrent.path = path,
+		setPath : (parrent, {path}) => parrent.setPath = path,
 		setMethod : (parrent, {method}) => parrent.method = method,
 		setDescription: (parrent, {description}) => parrent.description = description,
+		setOutput: (parrent, {output}) => parrent.output = output,
 		modifyHeaders : (parrent) => parrent.headers,
 		modifyResponceHeaders: (parrent) => parrent.responceHeaders,
 
 		addQueryParam : (parrent, {params}) => 
-			{params.forEach((value)=>{parrent.queryParams.push(value)});
+			{params.forEach((value)=>{
+				parrent.queryParams.push(value)
+				parrent.query.query.push(value)
+			});
 
 			return params;
 		},

@@ -21,6 +21,8 @@ type Endpoint {
 	responseHeaders : [Header]
 	body: String
 	queryParams : [String]
+	query : [String]
+	output : String
 }
 
 type Header {
@@ -44,7 +46,8 @@ type ModifyApi {
 type ModifyEndpoint {
 	setPath(path:String!) : String
 	setMethod(method:String!) : String
-	setDescription(description: String!) : String 
+	setDescription(description: String!) : String
+	setOutput(output : String!):String 
 	modifyHeaders : ModifyHeaders
 	modifyResponceHeaders: ModifyHeaders
 	modifyBody: ModifyBody
