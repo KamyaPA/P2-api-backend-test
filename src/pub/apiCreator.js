@@ -376,7 +376,7 @@ function Api(endpoint) {
             this.Query.queryList.forEach(query => {
                 queryList.push({
                     key: query.key,
-                    id: query.inputDom.selectedOptions[0].id + " " + query.inputDom.selectedOptions[0].value,
+                    id: query.inputDom.selectedOptions[0].id + " " + query.inputDom.selectedOptions[0].refrenceId,,
                 })
                 
             })
