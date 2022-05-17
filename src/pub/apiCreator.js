@@ -938,7 +938,7 @@ function Api(endpoint) {
 
                     let paramlist = object.key.split(/\.|[[{]/);
 
-                    bodyObj = this.Output.getBodyObj(paramlist,0,bodyObj, header.dom.refrenceId);   
+                    bodyObj = Object.assign(bodyObj,this.Output.getBodyObj(paramlist,0,bodyObj, header.dom.refrenceId));  
              
                    
                 }
