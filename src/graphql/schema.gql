@@ -22,12 +22,17 @@ type Endpoint {
 	body: String
 	queryParams : [String]
 	query : [String]
-	output : String
+	output : Output
 }
 
 type Header {
 	key : String
 	value : String 
+}
+
+type Output {
+	headers : JSON
+	body : JSON
 }
 
 type Mutation {
@@ -47,11 +52,11 @@ type ModifyEndpoint {
 	setPath(path:String!) : String
 	setMethod(method:String!) : String
 	setDescription(description: String!) : String
-	setOutput(output : String!):String 
 	modifyHeaders : ModifyHeaders
 	modifyResponceHeaders: ModifyHeaders
 	modifyBody: ModifyBody
 	modifyResponceBody : ModifyBody
+	modifyOutput : ModifyOutput
 	addQueryParam(params : [String]!): [String]
 }
 
@@ -62,5 +67,10 @@ type ModifyHeaders {
 
 type ModifyBody {
 	setBody(content : String) : String
+}
+
+type ModifyOutput {
+	setHeaders(headers : String) : JSON
+	setBody(body : String) : JSON
 }
 

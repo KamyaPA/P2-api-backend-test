@@ -112,18 +112,15 @@ const testApi = {
                                       "name": "string",
                                       "age": "string",
                                     },
-
                                   ]
                                 }
                             }
                         }
                     }
                 }
-            ]
-            
+            ]  
         }
     ],
-    
 }
 
 let selectedOutputs = [];
@@ -597,7 +594,10 @@ function Api(endpoint) {
 								key
 								value
 							}
-							output
+							output {
+								headers
+								body
+							}
                         }
                     }
                 }` 
@@ -758,7 +758,7 @@ function Api(endpoint) {
             const headerContainer = document.createElement("div");
             headerContainer.classList = "headers box";
             container.append(headerContainer);
-            Object.entries(this.methodObj.Output.Headers).forEach(valueSet => {
+            Object.entries(this.methodObj.output.headers).forEach(valueSet => {
                 let container = document.createElement("div");
                 
                 let input = document.createElement("input");
@@ -781,7 +781,7 @@ function Api(endpoint) {
             container.append(bodyLabel);
 
             container.append(bodyContainer);
-            let valueSet = Object.entries(this.methodObj.Output.Body)[0]; //.forEach(valueSet => {
+            let valueSet = Object.entries(this.methodObj.output.body)[0]; //.forEach(valueSet => {
 
 
             if(typeof valueSet[1] == "object"){
@@ -1191,21 +1191,19 @@ function Endpoint() {
     };
 
     this.getObject = () => {
-         
-        let object = { backend: {
-                endpoint: this.endpointLabelDom.value,
-                headers: this.Header.getAsList(),
-            },
-
-            
-        }
         let apiArr =[];
         this.createdApis.forEach(Api => {
             apiArr.push(Api.getObject());
         }) 
-        object.api = apiArr;
-
-        return object;
+         
+        let object = { backend: {
+                endpoint: this.endpointLabelDom.value,
+                headers: this.Header.getAsList(),
+				api : apiArr,
+            },
+            
+        }
+		return object
 
     }
 
@@ -1368,10 +1366,18 @@ function submitClick() {
         endpointArray.push(endpoint.getObject());
     })
     console.log(endpointArray);
-    // fetch("",{
-    //     method: "POST",
-    //     body: endpointArray
-    // });
+    fetch("/submit",{
+		headers: new Headers({'content-type': 'application/json'}),
+		method: "POST",
+		body: JSON.stringify(endpointArray),
+     })
+	.then(res => res.blob())
+	.then(data => {
+		let a = document.createElement("a");
+		a.href = window.URL.createObjectURL(data);
+		a.download = "server.js";
+		a.click();
+	});
 }
 
 //#region ------HTML creation helpers -------

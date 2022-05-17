@@ -51,7 +51,10 @@ export default {
 			headers : [],
 			queryParams : [],
 			query : {path: [], query: []},
-			output: "",
+			output: {
+				body: {},
+				headers: {},
+			},
 			body : "",
 
 		}

@@ -23,7 +23,7 @@ export const resolvers = {
         if(name){
             return Object.values(parrent.endpoints).filter(endpoint => endpoint.name === name)
         } else{
-                return Object.values(parrent.endpoints);
+            return Object.values(parrent.endpoints);
         }
     }
 },
@@ -53,7 +53,6 @@ export const resolvers = {
 		setPath : (parrent, {path}) => parrent.setPath = path,
 		setMethod : (parrent, {method}) => parrent.method = method,
 		setDescription: (parrent, {description}) => parrent.description = description,
-		setOutput: (parrent, {output}) => parrent.output = output,
 		modifyHeaders : (parrent) => parrent.headers,
 		modifyResponceHeaders: (parrent) => parrent.responceHeaders,
 
@@ -66,7 +65,7 @@ export const resolvers = {
 			return params;
 		},
 		modifyBody : (parrent) => parrent,
-		modifyResponceBody : () => "unset",
+		modifyOutput : (parrent) => parrent.output
 	},
 
 	ModifyHeaders : {
@@ -77,4 +76,9 @@ export const resolvers = {
 	ModifyBody: {
 		setBody : (parrent, {content}) => data.setBody(parrent, content),
 	},
+
+	ModifyOutput : {
+		setHeaders : (parrent, {headers}) => parrent.headers = JSON.parse(headers),
+		setBody : (parrent, {body}) => parrent.body = JSON.parse(body),
+	}
 }

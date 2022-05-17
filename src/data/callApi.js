@@ -17,7 +17,7 @@ export async function callApi(apiString, argv, filterStr){
 	// Set Parameters
 	let path = api.domain + endpoint.path;
 	let nQueryParams = 0;
-	let hederIndex;
+	let headerIndex = 0;
 	if(argv){
 		argv.forEach((argument) => {
 			argument = argument.split("=").map(value => value.trim());
@@ -30,7 +30,7 @@ export async function callApi(apiString, argv, filterStr){
 				}
 				path += argument[0] + "=" + argument[1];
 				nQueryParams += 1;
-			} else if((headerIndex = Object.values(headers).findIndex(v => v === "{" + argument[0] + "}"))){
+			} else if((headerIndex = Object.values(headers).findIndex(v => v === "{" + argument[0] + "}"))!= -1){
 				headers[Object.keys(headers)[headerIndex]] = argument[1];
 			} else {
 				path = path.replace(`{${argument[0]}}`, argument[1]);
@@ -54,7 +54,7 @@ export async function callApi(apiString, argv, filterStr){
 
 		let data = await fetch(path, payload)
 		.then(async (res) => ({body: await res.json(), headers:res.headers}));
-
+		console.log(data);
 		if(filterStr){
 			data = filterResponse(data.body, data.headers, filterStr);
 		}

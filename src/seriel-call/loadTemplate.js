@@ -78,6 +78,7 @@ export async function createServer(objectTemplate){
 
 // Endpoints
 function createEndpoint(endpointTemplate){
+	console.log(endpointTemplate);
 	return setTemplate("Create Endpoint", [
 		endpointTemplate.endpoint, 
 		endpointTemplate.api.reduce((code, api) => (code + createApi(api)), RAW) + 
@@ -86,9 +87,10 @@ function createEndpoint(endpointTemplate){
 
 // APIs
 function createApi(apiTemplate){
+	console.log(apiTemplate);
 	let argvObj = createArgvObj(apiTemplate.input.headers, {constants:{}, arrays:{}});
 	argvObj = createArgvObj(apiTemplate.input.query, argvObj);
-	let filter = createFilter(apiTemplate.output.body, apiTemplate.output.header);
+	let filter = createFilter(apiTemplate.output.body, apiTemplate.output.headers);
 
 	if(Object.values(argvObj.arrays).length > 0){
 		return setTemplate("Multi Call", [
@@ -150,12 +152,13 @@ function createFilter(config, headers){
 		rtn += "{" + filterObj(config) + "}";
 	}
 	headers.forEach(header => {
-		rtn += "#" + header.key + " " + header.id;
+		rtn += "#" + header.key + " " + header.key;
 	})
 	return rtn;
 }
 
 function filterObj(config){
+	console.log(config);
 	let rtn = "";
 	let keys = Object.keys(config);
 	for(let key of keys){
@@ -165,7 +168,7 @@ function filterObj(config){
 		} else {
 			switch(typeof(config[key])){
 				default:
-					if(config[key].match(/[\[\]]/)){
+					if(config[key].toString().match(/[\[\]]/)){
 						rtn += `${key}[=]${config[key].match(/[^\[\]]+/g)} ` 
 					} else {
 						rtn += `${key}=>${config[key]} ` 

@@ -8,8 +8,10 @@
 	let errorRemover;
 
 //# Setup #
-import {H, P, S} from './config.js';
-import {get} from 'https';
+const H = "localhost";
+const P = 3000; 
+const S = "http://localhost:8080/graphql";
+const {get} = require('http');
 async function call(server, {domain, endpoint, argv, filter} ){
 	let argvStr = argv.reduce((prev, cur) => prev += '"' + cur.key + '=' + cur.value + '",', "");
 	return (await makeQueryCall(`${server}?query={call(api:"${domain}/${endpoint}",argv:[${argvStr}],filter:"${filter}")}`)).data.call;
@@ -19,21 +21,28 @@ async function callParalel(server, calls){
 	await calls.forEach(({domain, endpoint, argv, filter}, index) => {
 		let argvStr = argv.reduce((prev, cur) => prev += '"' + cur.key + '=' + cur.value + '",', "");
 		callStr += `c${index}:call(api:"${domain}/${endpoint}",argv:[${argvStr}],filter:"${filter}") `
-	})
+	});
 	callStr += '}';
 	return Object.values((await makeQueryCall(callStr)).data);
 }
 async function makeQueryCall(callStr){
-	return await fetch(callStr, {
-		method : "GET"
-	}).then(res => res.json());
+	let data = "";
+	return new Promise((resolve, reject) => {
+		get(callStr, res => {
+			res.on("data", chunk => {data += chunk});
+			res.on("error", () => reject());
+			res.on("end", () => {
+				resolve(JSON.parse(data));
+			});
+		})
+	});
 }
 //@
 
 //# Setup HTTP #
-import http from 'http';
-import url from 'url';
-export const server = http.createServer(async (req, res)=>{
+const http = require('http');
+const url = require('url');
+const server = http.createServer(async (req, res)=>{
 	let R = [];
 	let u = url.parse(req.url);
 	if(u.query){
@@ -75,6 +84,7 @@ default:
 
 //# Single Call #
 R.push(await call(S,_0_));
+console.log(R);
 //@
 
 //# Multi Call #
