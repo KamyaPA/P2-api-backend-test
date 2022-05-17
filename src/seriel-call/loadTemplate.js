@@ -88,7 +88,7 @@ function createEndpoint(endpointTemplate){
 function createApi(apiTemplate){
 	let argvObj = createArgvObj(apiTemplate.input.headers, {constants:{}, arrays:{}});
 	argvObj = createArgvObj(apiTemplate.input.query, argvObj);
-	let filter = createFilter(apiTemplate.output.body);
+	let filter = createFilter(apiTemplate.output.body, apiTemplate.output.header);
 
 	if(Object.values(argvObj.arrays).length > 0){
 		return setTemplate("Multi Call", [
@@ -142,13 +142,16 @@ function createArrayCallObjCode(argvArray, index, domain, endpoint, constants, f
 }
 
 // Create filter
-function createFilter(config){
+function createFilter(config, headers){
 	let rtn = ""
 	if(Array.isArray(config)){
 		rtn += "[" + fitlerArr(config) + "]";
 	} else {
 		rtn += "{" + filterObj(config) + "}";
 	}
+	headers.forEach(header => {
+		rtn += "#" + header.key + " " + header.id;
+	})
 	return rtn;
 }
 

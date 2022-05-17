@@ -302,7 +302,7 @@ function Api(endpoint) {
         let label = document.createElement("label");
         label.innerHTML="Body: ";
         this.dom.append(label)
-
+/*
         let dom = document.createElement("div");
         dom.classList = "apiBody box";
         this.dom.append(dom);
@@ -310,7 +310,7 @@ function Api(endpoint) {
             dom.append(createLabel("", valueSet[0] + "  :  " + valueSet[1]));
         
         });
-
+*/
 
     }
 

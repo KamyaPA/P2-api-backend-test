@@ -9,11 +9,15 @@ export async function callApi(apiString, argv, filterStr){
 	apiString = apiString.split("/");
 	let api = storedApis[apiString[0]];
 	let endpoint = api.endpoints[apiString[1]];
+	let headers =  endpoint.headers.reduce((prev, cur) => {
+		prev[cur.key] = cur.value;
+		return prev;
+	}, {})
 	var payload;
-
 	// Set Parameters
 	let path = api.domain + endpoint.path;
 	let nQueryParams = 0;
+	let hederIndex;
 	if(argv){
 		argv.forEach((argument) => {
 			argument = argument.split("=").map(value => value.trim());
@@ -26,20 +30,19 @@ export async function callApi(apiString, argv, filterStr){
 				}
 				path += argument[0] + "=" + argument[1];
 				nQueryParams += 1;
-			}
-			else{
+			} else if((headerIndex = Object.values(headers).findIndex(v => v === "{" + argument[0] + "}"))){
+				headers[Object.keys(headers)[headerIndex]] = argument[1];
+			} else {
 				path = path.replace(`{${argument[0]}}`, argument[1]);
 			}
 		})
 	}
 	// Call API
-	
-
 	const bodyParam = {
 		body : endpoint.body
 	}
 	let obj = {
-		headers : endpoint.headers.reduce((prev, cur) => {prev[cur.key] = cur.value}, {}),
+		headers : headers,
 		method : endpoint.method,
 	}
 	if(typeof endpoint.body === 'string' && endpoint.body.length > 0){
@@ -50,15 +53,10 @@ export async function callApi(apiString, argv, filterStr){
 	}
 
 		let data = await fetch(path, payload)
-		.then(res => {
-			let data;
-			data = res.json();
-			return data;
-		})
-		.then(body => body);
+		.then(async (res) => ({body: await res.json(), headers:res.headers}));
 
 		if(filterStr){
-			data = filterResponse(data, filterStr);
+			data = filterResponse(data.body, data.headers, filterStr);
 		}
 
 		return data;

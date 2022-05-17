@@ -1,14 +1,20 @@
-export function filterResponse(responce, filterStr, filteredResonce){
+export function filterResponse(responce, headers, filterStr, filteredResonce){
 	let rtnObj = {};
 	let filterObject = createFilterObject(filterStr);
-	switch(filterObject.objectType){
-		case "object":
-			responce = filterResponseObject(responce, filterObject.format, rtnObj);
-			break;
-		case "array":
-			responce = filterResponseArray(responce, filterObject.format, rtnObj);
-			break;
-	}
+	filterObject.forEach(({objectType, format}) => {
+		switch(objectType){
+			case "object":
+				responce = filterResponseObject(responce, format, rtnObj);
+				break;
+			case "array":
+				responce = filterResponseArray(responce, format, rtnObj);
+				break;
+			case "header":
+				rtnObj[format.assignTo] = headers.get(format.name);
+				console.log("hi");
+				break;
+		}
+	})
 	return rtnObj;
 }
 // Deletes from object according to the filter object
@@ -128,17 +134,23 @@ function filterResponseArray(responce, format, rtnObj){
 	return responce;
 }
 
+
+
 // Filters object
 function createFilterObject(filterStr){
-	let filterArray = filterStr.match(/((=>)|\[=\]|(\[=\])|('[^]+')|[:\(\)\[\]\{\}]|[^\s:\(\)\[\]\{\}=>]+)/g);
-	return createObject(filterArray, {objectType : "value", format : {}});
+	let filterArray = filterStr.match(/((=>)|\[=\]|(\[=\])|('[^]+')|[:\(\)\[\]\{\}\#]|[^\s:\(\)\[\]\{\}=>]+)/g);
+	let rtn = [];
+	while(filterArray.length){
+		rtn.push(createObject(filterArray, {objectType : "value", format : {}}));
+	}
+	return rtn;
 }
 
 // The recursive function that creates the object that will be used to filter the response
 function createObject(filterArray, object){
 	// Check for data
 	let argument = filterArray.shift();
-	object.objectType =  argument === "{" ? "object" : argument === "[" ? "array" : undefined;
+	object.objectType =  argument === "{" ? "object" : argument === "[" ? "array" : argument === "#" ? "header": undefined ;
 	if(!object.objectType){
 		throw "Not a valid char after ':'";
 	}
@@ -167,9 +179,8 @@ function createObject(filterArray, object){
 				}
 			}
 		}
-	}
-	// ARRAY
-	if(object.objectType === "array"){
+	} else if(object.objectType === "array"){
+		// ARRAY
 		object.format["contains"] = {
 			objectType : "value",
 			rtn : {isOn : false},
@@ -211,7 +222,10 @@ function createObject(filterArray, object){
 					break;
 			}
 		}
-	}
+	} else if (object.objectType === "header"){
+		object.format.name = filterArray.shift();
+		object.format.assignTo = filterArray.shift();
+	} 
 	return object;
 }
 
