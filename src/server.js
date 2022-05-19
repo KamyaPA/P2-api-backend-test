@@ -27,7 +27,6 @@ app.get('/apiCreator.js', async (req, res) => {
 
 app.post('/submit', async (req, res) => {
 	const rtnServer = await createServer(req.body);
-	console.log(rtnServer);
 	res.setHeader("content-disposition", "attachment;filename=\"server.js\"");
 	res.setHeader("content-type", "text/javascript");
 	res.send(rtnServer);
