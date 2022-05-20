@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --verbose"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +16,7 @@
     "graphql": "^16.3.0",
     "graphql-tools": "^8.2.6",
     "graphql-type-json": "^0.3.2",
+    "jest": "^28.1.0",
     "node-fetch": "^2.6.7"
   }
 }

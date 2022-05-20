@@ -119,7 +119,7 @@ function filterResponseArray(responce, format, rtnObj){
 		responce.map(value => filterResponseObject(value, format.contains.format, rtnObj));
 	} else if(format.contains.objectType === "array"){
 		responce.map(value => filterResponseArray(value, format.contains.format, rtnObj));
-	} else if(fromat.contains.objectType.value === "value" && format.contains.rtn.isOn){
+	} else if(format.contains.objectType === "value" && format.contains.rtn.isOn){
 		if(format.contains.rtn.isArray){
 			if(rtnObj[format.contains.rtn.name] === undefined){
 				rtnObj[format.contains.rtn.name] = [];

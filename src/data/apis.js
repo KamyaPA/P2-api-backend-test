@@ -92,7 +92,12 @@ export default {
 
 	deleteHeader : (headerList, key) => {
 		let oldLength = headerList.length;
-		headerList = headerList.filter(value => value.key !== key)
+		for(let i = 0; i < headerList.length; i++){
+			if(headerList[i].key === key){
+				headerList.splice(i, 1);
+				break;
+			}
+		}
 		let newLength = headerList.length;
 		if(newLength === oldLength){
 			throw "header does not exist";
