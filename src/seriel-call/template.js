@@ -11,7 +11,7 @@
 const H = "localhost";
 const P = 3000; 
 const S = "http://localhost:8080/graphql";
-const {get} = require('http');
+const {get} = require('https');
 async function call(server, {domain, endpoint, argv, filter} ){
 	let argvStr = argv.reduce((prev, cur) => prev += '"' + cur.key + '=' + cur.value + '",', "");
 	return (await makeQueryCall(`${server}?query={call(api:"${domain}/${endpoint}",argv:[${argvStr}],filter:"${filter}")}`)).data.call;

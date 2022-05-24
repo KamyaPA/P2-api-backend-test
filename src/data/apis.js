@@ -72,7 +72,7 @@ export default {
 	},
 
 	deleteEndpoint : (api, name) => {
-		delete api.enpoints[name]
+		delete api.endpoints[name]
 		return `Deleted Enpoint "${api.name}/${name}"`
 	},
 

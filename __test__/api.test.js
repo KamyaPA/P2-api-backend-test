@@ -44,16 +44,24 @@ test('Create Header', () => {
 
 test('Delete Header', () => {
 	data.deleteHeader(endpoint.headers, "content-type");
-	console.log(endpoint.headers)
 	expect(endpoint.headers[0]).toBe(undefined);
 })
 
 test('Call', () => {
-	console.log(endpoint.headers)
-	callApi(TEST_API_NAME, TEST_ENDPOINT_NAME, ["pokemon=charmander"], "{name=>name}")
+	callApi(`${TEST_API_NAME}/${TEST_ENDPOINT_NAME}`, ["pokemon=charmander"], "{name=>name}")
 	.then(({data}) => {
 		expect(data.call.name).toBe("charmander");
 	});
+})
+
+test('Delete Endpoint', () => {
+	data.deleteEndpoint(api, TEST_ENDPOINT_NAME);
+	expect(api.endpoints[TEST_ENDPOINT_NAME]).toBe(undefined);
+})
+
+test('Delete Api', () => {
+	data.deleteApi(TEST_API_NAME);
+	expect(storedApis[TEST_API_NAME]).toBe(undefined);
 })
 
 
