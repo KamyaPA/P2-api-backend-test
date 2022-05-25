@@ -10,8 +10,7 @@
 //# Setup #
 const H = "localhost";
 const P = 3000; 
-const S = "http://localhost:8080/graphql";
-const {get} = require('https');
+const S = _0_ + "/graphql";
 async function call(server, {domain, endpoint, argv, filter} ){
 	let argvStr = argv.reduce((prev, cur) => prev += '"' + cur.key + '=' + cur.value + '",', "");
 	return (await makeQueryCall(`${server}?query={call(api:"${domain}/${endpoint}",argv:[${argvStr}],filter:"${filter}")}`)).data.call;
@@ -25,6 +24,24 @@ async function callParalel(server, calls){
 	callStr += '}';
 	return Object.values((await makeQueryCall(callStr)).data);
 }
+//@
+//# Call HTTPS # 
+const {get} = require('https');
+async function makeQueryCall(callStr){
+	let data = "";
+	return new Promise((resolve, reject) => {
+		get(callStr, res => {
+			res.on("data", chunk => {data += chunk});
+			res.on("error", () => reject());
+			res.on("end", () => {
+				resolve(JSON.parse(data));
+			});
+		})
+	});
+}
+//@
+//# Call HTTP # 
+const {get} = require('http');
 async function makeQueryCall(callStr){
 	let data = "";
 	return new Promise((resolve, reject) => {

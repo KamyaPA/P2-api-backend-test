@@ -68,7 +68,12 @@ function createObjStr(parameter){
 
 // Create the server 
 export async function createServer(objectTemplate){
-	let rtn = setTemplate("Setup").slice(RAW.length);
+	let rtn = setTemplate("Setup", [global.serverAddress]).slice(RAW.length);
+	if(global.https){
+		rtn += setTemplate("Call HTTPS").slice(RAW.length);
+	} else {
+		rtn += setTemplate("Call HTTP").slice(RAW.length);
+	}
 	rtn += setTemplate("Setup HTTP", [
 		objectTemplate.reduce((code, {backend}) => (code + (createEndpoint(backend))), RAW)
 	]).slice(RAW.length);
