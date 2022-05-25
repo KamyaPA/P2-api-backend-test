@@ -37,7 +37,7 @@ app.post('/submit', async (req, res) => {
 app.use('/graphql', setupGraphQL());
 
 // Start server if the HTTPs server should not start
-if(!global.https){
+if(global.https === undefined){
 	global.serverAddress = `http://${HOSTNAME}:${PORT}`
 	app.listen(PORT, HOSTNAME, () => {
 		console.log(`Server is on at ${HOSTNAME}:${PORT}`);
