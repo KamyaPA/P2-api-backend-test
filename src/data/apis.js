@@ -43,7 +43,8 @@ export default {
 			path : "",
 			set setPath(value) {
 				let params = value.match(new RegExp("(?<=\{)[^\}]+(?=\})", "g"));
-				this.query.path = params;
+				console.log(params);
+				this.query.path = params === null ? [] : params;
 				this.path = value;
 			},
 			method : undefined,

@@ -52,13 +52,13 @@ export async function callApi(apiString, argv, filterStr){
 		payload = obj;
 	}
 
-		let data = await fetch(path, payload)
-		.then(async (res) => ({body: await res.json(), headers:res.headers}));
-		console.log(data);
-		if(filterStr){
-			data = filterResponse(data.body, data.headers, filterStr);
-		}
+	let data = await fetch(path, payload)
+	.then(async (res) => ({body: await res.json(), headers:res.headers}));
+	console.log(data);
+	if(filterStr){
+		data = filterResponse(data.body, data.headers, filterStr);
+	}
 
-		return data;
+	return data;
 }
 
